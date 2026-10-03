@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Computer Practical Exam & Trainer Studio</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #0d1117;
+      --card-header: #161b22;
+      --text-main: #c9d1d9;
+      --neon-green: #00ff66;
+      --neon-hover: #00cc52;
+      --neon-dim: rgba(0, 255, 102, 0.12);
+      --border-dark: #30363d;
+      --accent-red: #ff5555;
+      --accent-yellow: #ffb86c;
+      --accent-blue: #58a6ff;
+      --white: #ffffff;
+      --gray-light: #e1e4e8;
+      --gray-dark: #21262d;
+      --font-mono: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: var(--font-sans);
+      color: #24292e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sticky Test Header */
+    #test-header {
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid var(--neon-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .test-info-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+
+    .test-info-badge {
+      background: var(--gray-dark);
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border-dark);
+    }
+
+    .test-info-badge span {
+      color: var(--neon-green);
+      font-weight: bold;
+      font-family: var(--font-mono);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: var(--border-dark);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--neon-green);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Views */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Terminal Cards */
+    .terminal-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      color: var(--text-main);
+      margin-bottom: 25px;
+    }
+
+    .terminal-header {
+      background-color: var(--card-header);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background-color: var(--accent-red); }
+    .dot-yellow { background-color: var(--accent-yellow); }
+    .dot-green { background-color: var(--neon-green); }
+
+    .terminal-title {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #8b949e;
+    }
+
+    .terminal-body {
+      padding: 24px;
+    }
+
+    /* Home Page Grid */
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .home-card {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 40px 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .home-card:hover {
+      border-color: var(--neon-green);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 255, 102, 0.15);
+    }
+
+    .home-card-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+    }
+
+    .home-card-title {
+      font-size: 1.6rem;
+      color: var(--white);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .home-card-desc {
+      color: #8b949e;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-family: var(--font-mono);
+    }
+
+    .btn-neon {
+      background-color: var(--neon-green);
+      color: #040d06;
+    }
+
+    .btn-neon:hover {
+      background-color: var(--neon-hover);
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--neon-dim);
+    }
+
+    .btn-secondary {
+      background-color: var(--gray-dark);
+      color: var(--text-main);
+      border: 1px solid var(--border-dark);
+    }
+
+    .btn-secondary:hover {
+      background-color: #30363d;
+      color: var(--white);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--neon-green);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #010409;
+      border: 1px solid var(--border-dark);
+      border-radius: 6px;
+      color: var(--white);
+      font-size: 1rem;
+      font-family: var(--font-mono);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 102, 0.15);
+    }
+
+    /* Python Code Editor */
+    .editor-wrapper {
+      display: flex;
+      background-color: #010409;
+      border: 1px solid var(--border-dark);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .line-numbers {
+      padding: 12px 10px;
+      background-color: #0d1117;
+      color: #484f58;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: right;
+      user-select: none;
+      border-right: 1px solid var(--border-dark);
+    }
+
+    .code-input {
+      width: 100%;
+      height: 220px;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: #e6edf3;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      white-space: pre;
+      tab-size: 4;
+    }
+
+    /* Feedback Display */
+    .check-results {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #010409;
+      border-radius: 6px;
+      border-left: 4px solid var(--border-dark);
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      font-family: var(--font-mono);
+    }
+
+    .check-item.pass {
+      color: var(--neon-green);
+    }
+
+    .check-item.fail {
+      color: var(--accent-red);
+    }
+
+    /* MCQ & Viva Elements */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 18px;
+      background-color: #010409;
+      border: 1px solid var(--border-dark);
+      border-radius: 6px;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .option-btn:hover {
+      border-color: var(--neon-green);
+      background-color: rgba(0, 255, 102, 0.05);
+    }
+
+    .option-btn.correct {
+      background-color: rgba(0, 255, 102, 0.2) !important;
+      border-color: var(--neon-green) !important;
+      color: var(--neon-green) !important;
+    }
+
+    .option-btn.incorrect {
+      background-color: rgba(255, 85, 85, 0.2) !important;
+      border-color: var(--accent-red) !important;
+      color: var(--accent-red) !important;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .badge-neon {
+      background: var(--neon-dim);
+      color: var(--neon-green);
+      border: 1px solid var(--neon-green);
+    }
+
+    /* Requirements Box */
+    .req-box {
+      background: #010409;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid var(--border-dark);
+      margin: 15px 0;
+    }
+
+    .req-box ul {
+      margin-left: 20px;
+      margin-top: 8px;
+      color: #8b949e;
+    }
+
+    .req-box li {
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+    }
+
+    /* Scorecard Table */
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-family: var(--font-mono);
+    }
+
+    .score-table th, .score-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .score-table th {
+      color: var(--neon-green);
+      background: var(--card-header);
+    }
+
+    /* Trainer Layout */
+    .trainer-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .trainer-nav-btn {
+      padding: 15px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-dark);
+      border-radius: 6px;
+      color: var(--white);
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .trainer-nav-btn:hover, .trainer-nav-btn.active {
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      background: var(--neon-dim);
+    }
+
+    .code-block {
+      background: #010409;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid var(--border-dark);
+      font-family: var(--font-mono);
+      color: var(--neon-green);
+      white-space: pre-wrap;
+      margin: 10px 0;
+      font-size: 0.9rem;
+    }
+
+    /* Utility */
+    .hidden { display: none !important; }
+    .text-neon { color: var(--neon-green); }
+    .text-muted { color: #8b949e; }
+    .mt-20 { margin-top: 20px; }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 12px; margin: 15px auto; }
+      #test-header { padding: 10px 14px; font-size: 0.85rem; }
+      .home-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Test Navigation Header -->
+  <header idtest-header id="test-header" class="hidden">
+    <div class="test-info-group">
+      <div class="test-info-badge">STUDENT: <span id="bar-student-name">--</span></div>
+      <div class="test-info-badge">ROLL: <span id="bar-student-roll">--</span></div>
+      <div class="test-info-badge">SECTION: <span id="bar-section-name">PRACTICAL</span></div>
+    </div>
+    <div class="test-info-group">
+      <div class="test-info-badge">TIME: <span id="bar-timer">00:00</span></div>
+      <div class="test-info-badge">PROGRESS: <span id="bar-progress">0%</span></div>
+    </div>
+    <div style="width: 100%;">
+      <div class="progress-bar-container">
+        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- VIEW 0: HOME PAGE -->
+    <section id="view-home" class="view active">
+      <div style="text-align: center; margin-bottom: 40px; margin-top: 20px;">
+        <h1 style="font-size: 2.4rem; font-weight: 800; color: #0d1117; margin-bottom: 10px;">
+          COMPUTER PRACTICAL EXAM & TRAINER
+        </h1>
+        <p style="color: #57606a; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+          Interactive examination portal and self-paced studio for Python programming, practical file operations, and viva voce testing.
+        </p>
+      </div>
+
+      <div class="home-grid">
+        <div class="home-card" onclick="app.startTestFlow()">
+          <div class="home-card-icon">📝</div>
+          <div class="home-card-title">START TEST</div>
+          <div class="home-card-desc">Formal time-bound examination environment containing Practicals, Viva Voce, and MCQs with automated score evaluation.</div>
+        </div>
+
+        <div class="home-card" onclick="app.openTrainerMode()">
+          <div class="home-card-icon">🧑‍💻</div>
+          <div class="home-card-title">TRAINER</div>
+          <div class="home-card-desc">Guided preparation studio featuring practical solution breakdowns, code testing sandboxes, viva cards, and practice questions.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 1: REGISTRATION -->
+    <section id="view-registration" class="view">
+      <div class="terminal-card" style="max-width: 600px; margin: 40px auto;">
+        <div class="terminal-header">
+          <div class="window-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="terminal-title">student_auth.py</div>
+        </div>
+        <div class="terminal-body">
+          <h2 style="color: var(--white); margin-bottom: 8px;">EXAM REGISTRATION</h2>
+          <p class="text-muted" style="margin-bottom: 24px; font-size: 0.9rem;">Please enter your credentials to initiate the practical assessment session.</p>
+
+          <form onsubmit="app.confirmRegistration(event)">
+            <div class="form-group">
+              <label for="reg-name">> ENTER STUDENT NAME</label>
+              <input type="text" id="reg-name" class="form-control" placeholder="e.g. John Doe" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-roll">> ENTER ROLL NUMBER</label>
+              <input type="text" id="reg-roll" class="form-control" placeholder="e.g. 102948" required autocomplete="off">
+            </div>
+
+            <div class="btn-group" style="justify-content: space-between; margin-top: 30px;">
+              <button type="button" class="btn btn-secondary" onclick="app.showView('view-home')">← BACK HOME</button>
+              <button type="submit" class="btn btn-neon">START EXAM 🚀</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: PRACTICAL TEST -->
+    <section id="view-practical" class="view">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="window-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="terminal-title" id="prac-file-title">practical_1.py</div>
+        </div>
+        <div class="terminal-body">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span class="badge badge-neon" id="prac-number-badge">PRACTICAL 1 OF 6</span>
+              <h2 id="prac-title" style="color: var(--white); margin-bottom: 8px;">Title</h2>
+            </div>
+          </div>
+
+          <p id="prac-desc" style="color: var(--text-main); margin-top: 10px; line-height: 1.5;">Description</p>
+
+          <div class="req-box">
+            <div style="color: var(--neon-green); font-family: var(--font-mono); font-size: 0.85rem; font-weight: bold;">REQUIRED SYNTAX CONCEPTS:</div>
+            <ul id="prac-req-list"></ul>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <label style="color: var(--text-main); font-family: var(--font-mono); font-size: 0.85rem;">PYTHON SOURCE CODE EDITOR:</label>
+            <div class="editor-wrapper">
+              <div class="line-numbers" id="prac-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+              <textarea id="prac-code-editor" class="code-input" spellcheck="false" placeholder="# Write your Python solution code here..."></textarea>
+            </div>
+          </div>
+
+          <div id="prac-check-results" class="check-results hidden"></div>
+
+          <div class="btn-group" style="justify-content: space-between;">
+            <div style="display: flex; gap: 10px;">
+              <button type="button" class="btn btn-outline" onclick="app.checkPracticalCode()">CHECK CODE</button>
+              <button type="button" class="btn btn-secondary" onclick="app.resetPracticalCode()">RESET</button>
+            </div>
+            <button type="button" id="prac-submit-btn" class="btn btn-neon" onclick="app.submitPractical()">SUBMIT PRACTICAL →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: VIVA TEST -->
+    <section id="view-viva" class="view">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="window-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="terminal-title">viva_voce.py</div>
+        </div>
+        <div class="terminal-body">
+          <span class="badge badge-neon" id="viva-counter-badge">QUESTION 1 OF 15</span>
+          <h2 id="viva-question-text" style="color: var(--white); margin: 12px 0 20px 0;">Viva Question Text</h2>
+
+          <div class="form-group">
+            <label for="viva-answer-input">> TYPE YOUR ANSWER BELOW:</label>
+            <textarea id="viva-answer-input" class="code-input" style="background: #010409; border: 1px solid var(--border-dark); border-radius: 6px; height: 120px;" placeholder="Write a clear, concise explanation..."></textarea>
+          </div>
+
+          <div id="viva-feedback" class="check-results hidden"></div>
+
+          <div class="btn-group" style="justify-content: space-between;">
+            <button type="button" class="btn btn-outline" onclick="app.submitVivaAnswer()">SUBMIT ANSWER</button>
+            <button type="button" id="viva-next-btn" class="btn btn-neon" onclick="app.nextVivaQuestion()">NEXT QUESTION →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: MCQ TEST -->
+    <section id="view-mcq" class="view">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="window-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="terminal-title">mcq_assessment.py</div>
+        </div>
+        <div class="terminal-body">
+          <span class="badge badge-neon" id="mcq-counter-badge">MCQ 1 OF 15</span>
+          <h2 id="mcq-question-text" style="color: var(--white); margin: 12px 0 20px 0;">MCQ Question Text</h2>
+
+          <div id="mcq-options-container" class="options-list"></div>
+
+          <div id="mcq-feedback" class="check-results hidden" style="margin-top: 20px;"></div>
+
+          <div class="btn-group" style="justify-content: flex-end; margin-top: 25px;">
+            <button type="button" id="mcq-next-btn" class="btn btn-neon hidden" onclick="app.nextMCQQuestion()">NEXT QUESTION →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: FINAL RESULT -->
+    <section id="view-result" class="view">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="window-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div class="terminal-title">final_assessment_report.py</div>
+        </div>
+        <div class="terminal-body">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <span class="badge badge-neon">EXAMINATION COMPLETED</span>
+            <h1 style="color: var(--white); font-size: 2.2rem; margin-top: 10px;">PRACTICAL EXAM SCORECARD</h1>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div style="background: #010409; padding: 15px; border-radius: 6px; border: 1px solid var(--border-dark);">
+              <div class="text-muted" style="font-size: 0.8rem; font-family: var(--font-mono);">STUDENT NAME</div>
+              <div id="res-student-name" style="color: var(--white); font-weight: bold; font-size: 1.1rem; margin-top: 4px;">--</div>
+            </div>
+            <div style="background: #010409; padding: 15px; border-radius: 6px; border: 1px solid var(--border-dark);">
+              <div class="text-muted" style="font-size: 0.8rem; font-family: var(--font-mono);">ROLL NUMBER</div>
+              <div id="res-student-roll" style="color: var(--white); font-weight: bold; font-size: 1.1rem; margin-top: 4px;">--</div>
+            </div>
+            <div style="background: #010409; padding: 15px; border-radius: 6px; border: 1px solid var(--border-dark);">
+              <div class="text-muted" style="font-size: 0.8rem; font-family: var(--font-mono);">TOTAL TIME TAKEN</div>
+              <div id="res-time-taken" style="color: var(--neon-green); font-weight: bold; font-size: 1.1rem; margin-top: 4px;">--</div>
+            </div>
+          </div>
+
+          <table class="score-table">
+            <thead>
+              <tr>
+                <th>SECTION</th>
+                <th>EVALUATION METHOD</th>
+                <th>SCORE OBTAINED</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1. Python Practicals</td>
+                <td>6 Program Tasks (Code Checker)</td>
+                <td id="res-prac-score" style="font-weight: bold; color: var(--white);">0 / 60</td>
+              </tr>
+              <tr>
+                <td>2. Viva Voce</td>
+                <td>15 Theoretical Q&A</td>
+                <td id="res-viva-score" style="font-weight: bold; color: var(--white);">0 / 15</td>
+              </tr>
+              <tr>
+                <td>3. MCQ Test</td>
+                <td>15 Multiple Choice Questions</td>
+                <td id="res-mcq-score" style="font-weight: bold; color: var(--white);">0 / 15</td>
+              </tr>
+              <tr style="background: rgba(0, 255, 102, 0.05);">
+                <td style="color: var(--neon-green); font-weight: bold;">OVERALL AGGREGATE</td>
+                <td style="color: var(--neon-green); font-weight: bold;">Cumulative Grade</td>
+                <td id="res-overall-score" style="font-weight: bold; color: var(--neon-green); font-size: 1.2rem;">0 / 90 (0%)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: 30px;">
+            <h3 style="color: var(--white); margin-bottom: 12px;">DIAGNOSTIC FEEDBACK & REVISION AREAS</h3>
+            <div id="res-mistakes-container" style="background: #010409; padding: 18px; border-radius: 6px; border: 1px solid var(--border-dark);">
+            </div>
+          </div>
+
+          <div class="btn-group" style="justify-content: space-between; margin-top: 35px;">
+            <button type="button" class="btn btn-secondary" onclick="app.showView('view-home')">🏠 BACK TO HOME</button>
+            <button type="button" class="btn btn-neon" onclick="app.startTestFlow()">RETAKE TEST 🔄</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 6: TRAINER MODE HOME & SUB-MODULES -->
+    <section id="view-trainer" class="view">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="color: #0d1117; font-size: 1.8rem;">PREPARATION TRAINER STUDIO</h2>
+          <p style="color: #57606a;">Self-paced practice and learning environment (Scores do not affect real test).</p>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="app.showView('view-home')">🏠 HOME</button>
+      </div>
+
+      <div class="trainer-nav">
+        <div class="trainer-nav-btn active" id="tb-guide" onclick="app.switchTrainerTab('guide')">📚 PRACTICAL GUIDE</div>
+        <div class="trainer-nav-btn" id="tb-practice" onclick="app.switchTrainerTab('practice')">⌨️ PRACTICE CODE</div>
+        <div class="trainer-nav-btn" id="tb-viva" onclick="app.switchTrainerTab('viva')">🎤 VIVA GUIDE</div>
+        <div class="trainer-nav-btn" id="tb-mcq" onclick="app.switchTrainerTab('mcq')">🧠 MCQ PRACTICE</div>
+      </div>
+
+      <!-- TRAINER TAB 1: PRACTICAL GUIDE -->
+      <div id="trainer-tab-guide" class="trainer-tab-content">
+        <div id="trainer-guide-list"></div>
+      </div>
+
+      <!-- TRAINER TAB 2: PRACTICE CODE -->
+      <div id="trainer-tab-practice" class="trainer-tab-content hidden">
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <div class="window-dots">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+            </div>
+            <div class="terminal-title">trainer_sandbox.py</div>
+          </div>
+          <div class="terminal-body">
+            <div class="form-group">
+              <label for="trainer-prac-select">> SELECT PRACTICAL TO PRACTICE:</label>
+              <select id="trainer-prac-select" class="form-control" onchange="app.loadTrainerPracticeSelect()">
+              </select>
+            </div>
+
+            <div id="trainer-prac-details" class="req-box" style="margin-top: 15px;"></div>
+
+            <div style="margin-top: 15px;">
+              <label style="color: var(--text-main); font-family: var(--font-mono); font-size: 0.85rem;">PRACTICE CODE EDITOR:</label>
+              <div class="editor-wrapper">
+                <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+                <textarea id="trainer-code-editor" class="code-input" spellcheck="false" placeholder="# Practice code here..."></textarea>
+              </div>
+            </div>
+
+            <div id="trainer-check-results" class="check-results hidden"></div>
+
+            <div class="btn-group" style="margin-top: 20px;">
+              <button type="button" class="btn btn-neon" onclick="app.checkTrainerPracticeCode()">CHECK MY CODE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAINER TAB 3: VIVA GUIDE -->
+      <div id="trainer-tab-viva" class="trainer-tab-content hidden">
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <div class="window-dots">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+            </div>
+            <div class="terminal-title">viva_flashcards.py</div>
+          </div>
+          <div class="terminal-body">
+            <span class="badge badge-neon" id="trainer-viva-badge">CARD 1 OF 15</span>
+            <h2 id="trainer-viva-q" style="color: var(--white); margin: 15px 0;">Viva Question</h2>
+
+            <div id="trainer-viva-a" class="code-block hidden" style="color: var(--text-main); font-family: var(--font-sans); font-size: 1rem; line-height: 1.5;"></div>
+
+            <div class="btn-group" style="justify-content: space-between; margin-top: 25px;">
+              <div>
+                <button type="button" class="btn btn-secondary" onclick="app.prevTrainerViva()">← PREVIOUS</button>
+                <button type="button" class="btn btn-secondary" onclick="app.nextTrainerViva()">NEXT →</button>
+              </div>
+              <button type="button" class="btn btn-outline" onclick="app.toggleTrainerVivaAnswer()">SHOW ANSWER</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAINER TAB 4: MCQ PRACTICE -->
+      <div id="trainer-tab-mcq" class="trainer-tab-content hidden">
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <div class="window-dots">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+            </div>
+            <div class="terminal-title">mcq_trainer_sandbox.py</div>
+          </div>
+          <div class="terminal-body">
+            <span class="badge badge-neon" id="trainer-mcq-badge">PRACTICE MCQ 1 OF 15</span>
+            <h2 id="trainer-mcq-q" style="color: var(--white); margin: 15px 0;">MCQ Question</h2>
+
+            <div id="trainer-mcq-opts" class="options-list"></div>
+
+            <div id="trainer-mcq-feedback" class="check-results hidden" style="margin-top: 20px;"></div>
+
+            <div class="btn-group" style="justify-content: flex-end; margin-top: 25px;">
+              <button type="button" id="trainer-mcq-next-btn" class="btn btn-neon hidden" onclick="app.nextTrainerMCQ()">NEXT PRACTICE MCQ →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script>
+    /* MASTER DATA STRUCTURES */
+    const PRACTICALS = [
+      {
+        id: 1,
+        title: "PRACTICAL 1 — SIMPLE CALCULATOR",
+        desc: "Construct a basic Python calculator that takes two numeric inputs from the user, computes addition, subtraction, multiplication, and division, and displays formatted results.",
+        reqs: ["input()", "int() or float()", "+", "-", "*", "/", "print()"],
+        checker: function(code) {
+          const res = [];
+          res.push({ label: "Uses input() for user entry", pass: /input\s*\(/.test(code) });
+          res.push({ label: "Converts inputs using int() or float()", pass: /(int|float)\s*\(/.test(code) });
+          res.push({ label: "Contains addition (+) operator", pass: /\+/.test(code) });
+          res.push({ label: "Contains subtraction (-) operator", pass: /-/.test(code) });
+          res.push({ label: "Contains multiplication (*) operator", pass: /\*/.test(code) });
+          res.push({ label: "Contains division (/) operator", pass: /\//.test(code) });
+          res.push({ label: "Uses print() to display results", pass: /print\s*\(/.test(code) });
+          return res;
+        },
+        guide: {
+          what: "A arithmetic application taking dynamic values.",
+          do: "Prompt user for two numbers, convert them to numbers, execute math operations, and output results.",
+          steps: ["Read input using input()", "Cast using float() or int()", "Compute +, -, *, /", "Print results"],
+          code: `# Practical 1 Solution\nnum1 = float(input("Enter first number: "))\nnum2 = float(input("Enter second number: "))\n\nprint("Add:", num1 + num2)\nprint("Sub:", num1 - num2)\nprint("Mul:", num1 * num2)\nprint("Div:", num1 / num2)`
+        }
+      },
+      {
+        id: 2,
+        title: "PRACTICAL 2 — SIMPLE QUIZ PROGRAM",
+        desc: "Build a single-question quiz program that asks the student a question, verifies if the answer equals the expected answer using an if condition, and prints feedback.",
+        reqs: ["input()", "if", "==", "print()"],
+        checker: function(code) {
+          const res = [];
+          res.push({ label: "Uses input() to ask question", pass: /input\s*\(/.test(code) });
+          res.push({ label: "Uses if statement", pass: /\bif\b/.test(code) });
+          res.push({ label: "Uses equality operator (==)", pass: /==/.test(code) });
+          res.push({ label: "Uses print() for output", pass: /print\s*\(/.test(code) });
+          return res;
+        },
+        guide: {
+          what: "A conditional evaluation script.",
+          do: "Ask question, store answer, compare with string equality ==",
+          steps: ["Prompt question", "Check equality with if", "Print success/failure"],
+          code: `# Practical 2 Solution\nans = input("What is the capital of France? ")\nif ans == "Paris":\n    print("Correct Answer!")\nelse:\n    print("Wrong Answer!")`
+        }
+      },
+      {
+        id: 3,
+        title: "PRACTICAL 3 — STORE A LIST AND WRITE IT TO FILE",
+        desc: "Create a list of data items (e.g. names or numbers), open a target file in write mode ('w'), write elements to file, and close the file properly.",
+        reqs: ["Create a list []", "open()", "'w' mode", "write()", "close()"],
+        checker: function(code) {
+          const res = [];
+          res.push({ label: "Creates a list using []", pass: /\[.*\]/.test(code) });
+          res.push({ label: "Opens file with open()", pass: /open\s*\(/.test(code) });
+          res.push({ label: "Uses write mode ('w' or \"w\")", pass: /['"]w['"]/.test(code) });
+          res.push({ label: "Calls write() method", pass: /\.write\s*\(/.test(code) });
+          res.push({ label: "Calls close() method", pass: /\.close\s*\(/.test(code) });
+          return res;
+        },
+        guide: {
+          what: "File output persistence from data collection.",
+          do: "Construct list, open file in 'w' mode, iterate or convert to string and write, close file stream.",
+          steps: ["Define list", "open file ('w')", "write contents", "close file"],
+          code: `# Practical 3 Solution\nitems = ["Apple", "Banana", "Cherry"]\nf = open("data.txt", "w")\nfor item in items:\n    f.write(item + "\\n")\nf.close()`
+        }
+      },
+      {
+        id: 4,
+        title: "PRACTICAL 4 — READ DATA FROM A FILE",
+        desc: "Open an existing text file in read mode ('r'), retrieve its content using read(), print the file content, and close the file.",
+        reqs: ["open()", "'r' mode", "read()", "print()", "close()"],
+        checker: function(code) {
+          const res = [];
+          res.push({ label: "Uses open() function", pass: /open\s*\(/.test(code) });
+          res.push({ label: "Uses read mode ('r' or \"r\")", pass: /['"]r['"]/.test(code) });
+          res.push({ label: "Uses read() method", pass: /\.read\s*\(/.test(code) });
+          res.push({ label: "Uses print() to show file data", pass: /print\s*\(/.test(code) });
+          res.push({ label: "Uses close() method", pass: /\.close\s*\(/.test(code) });
+          return res;
+        },
+        guide: {
+          what: "File content ingestion.",
+          do: "Open file in 'r' mode, invoke read(), output data to console, close stream.",
+          steps: ["open file ('r')", "data = f.read()", "print(data)", "f.close()"],
+          code: `# Practical 4 Solution\nf = open("data.txt", "r")\ncontent = f.read()\nprint(content)\nf.close()`
+        }
+      },
+      {
+        id: 5,
+        title: "PRACTICAL 5 — APPEND A NEW ITEM TO A FILE",
+        desc: "Prompt user for new item input using input(), open file in append mode ('a'), write new item to file, and close file.",
+        reqs: ["input()", "open()", "'a' mode", "write()", "close()"],
+        checker: function(code) {
+          const res = [];
+          res.push({ label: "Uses input() to capture new entry", pass: /input\s*\(/.test(code) });
+          res.push({ label: "Uses open() function", pass: /open\s*\(/.test(code) });
+          res.push({ label: "Uses append mode ('a' or \"a\")", pass: /['"]a['"]/.test(code) });
+          res.push({ label: "Uses write() method", pass: /\.write\s*\(/.test(code) });
+          res.push({ label: "Uses close() method", pass: /\.close\s*\(/.test(code) });
+          return res;
+        },
+        guide: {
+          what: "Non-destructive file appending.",
+          do: "Get input string, open target file in 'a' mode, append entry, call close().",
+          steps: ["Get input string", "open file ('a')", "f.write(input)", "f.close()"],
+          code: `# Practical 5 Solution\nnew_item = input("Enter new item: ")\nf = open("data.txt", "a")\nf.write(new_item + "\\n")\nf.close()`
+        }
+      },
+      {
+        id: 6,
+        title: "PRACTICAL 6 — STUDENT MARKS PROGRAM",
+        desc: "Define a list of numerical marks, compute their total sum using sum(), calculate average marks, and display results using print().",
+        reqs: ["List of marks []", "sum()", "Calculate average (/)", "print()"],
+        checker: function(code) {
+          const res = [];
+          res.push({ label: "Defines list of numbers []", pass: /\[.*\]/.test(code) });
+          res.push({ label: "Uses sum() function", pass: /sum\s*\(/.test(code) });
+          res.push({ label: "Calculates average using division (/)", pass: /\//.test(code) });
+          res.push({ label: "Outputs results with print()", pass: /print\s*\(/.test(code) });
+          return res;
+        },
+        guide: {
+          what: "Data aggregation and statistics.",
+          do: "Store numbers in list, compute sum() and len(), divide to get average, print values.",
+          steps: ["Declare marks list", "total = sum(marks)", "avg = total / len(marks)", "print()"],
+          code: `# Practical 6 Solution\nmarks = [85, 90, 78, 92, 88]\ntotal = sum(marks)\navg = total / len(marks)\n\nprint("Total Marks:", total)\nprint("Average Marks:", avg)`
+        }
+      }
+    ];
+
+    const VIVA_QUESTIONS = [
+      { id: 1, q: "What is Python?", keywords: ["programming", "language", "interpreted", "high-level"] },
+      { id: 2, q: "What is input()?", keywords: ["user", "take", "read", "string", "prompt", "enter"] },
+      { id: 3, q: "What is print()?", keywords: ["display", "output", "show", "screen", "console"] },
+      { id: 4, q: "What is a variable?", keywords: ["store", "container", "value", "memory", "data"] },
+      { id: 5, q: "What is a list?", keywords: ["collection", "ordered", "mutable", "items", "bracket", "elements"] },
+      { id: 6, q: "What is an if condition?", keywords: ["check", "decision", "conditional", "boolean", "true", "false"] },
+      { id: 7, q: "What does == mean?", keywords: ["equal", "comparison", "compare", "check", "value"] },
+      { id: 8, q: "What is file handling?", keywords: ["file", "open", "read", "write", "store", "disk", "data"] },
+      { id: 9, q: "What is 'r' mode?", keywords: ["read", "open", "only", "existing"] },
+      { id: 10, q: "What is 'w' mode?", keywords: ["write", "overwrite", "create", "new"] },
+      { id: 11, q: "What is 'a' mode?", keywords: ["append", "add", "end", "existing"] },
+      { id: 12, q: "What does read() do?", keywords: ["returns", "content", "file", "string", "get"] },
+      { id: 13, q: "What does write() do?", keywords: ["inserts", "puts", "text", "file", "save"] },
+      { id: 14, q: "What does close() do?", keywords: ["closes", "stream", "file", "release", "save", "resource"] },
+      { id: 15, q: "What does sum() do?", keywords: ["total", "adds", "numbers", "iterable", "list", "calculate"] }
+    ];
+
+    const MCQ_QUESTIONS = [
+      {
+        q: "Which built-in function is used to accept input from a console user in Python?",
+        opts: ["get()", "input()", "read()", "scanf()"],
+        ans: 1
+      },
+      {
+        q: "What is the correct file mode used to add new data at the end of an existing file without overwriting?",
+        opts: ["'r'", "'w'", "'a'", "'x'"],
+        ans: 2
+      },
+      {
+        q: "Which comparison operator checks if two values are equal in Python?",
+        opts: ["=", "==", "===", "equals"],
+        ans: 1
+      },
+      {
+        q: "What data structure is created using square brackets [ ] in Python?",
+        opts: ["Dictionary", "Tuple", "List", "Set"],
+        ans: 2
+      },
+      {
+        q: "Which function calculates the total sum of elements inside a numerical list?",
+        opts: ["total()", "count()", "add()", "sum()"],
+        ans: 3
+      },
+      {
+        q: "What does the 'w' mode in open() function do if the target file already exists?",
+        opts: ["Appends content", "Throws error", "Overwrites content", "Reads content"],
+        ans: 2
+      },
+      {
+        q: "Which method is mandatory to free system resources after working with a file?",
+        opts: ["close()", "stop()", "exit()", "flush()"],
+        ans: 0
+      },
+      {
+        q: "What type of value does the input() function return by default?",
+        opts: ["Integer", "Float", "String", "Boolean"],
+        ans: 2
+      },
+      {
+        q: "Which statement is used for conditional decision execution in Python?",
+        opts: ["for", "while", "if", "def"],
+        ans: 2
+      },
+      {
+        q: "How do you read the entire text of an open file object 'f' into a variable?",
+        opts: ["f.get()", "f.read()", "f.fetch()", "f.lines()"],
+        ans: 1
+      },
+      {
+        q: "Which operator performs standard numerical division yielding a float?",
+        opts: ["//", "%", "/", "*"],
+        ans: 2
+      },
+      {
+        q: "Which of the following creates a valid Python variable assignment?",
+        opts: ["var x = 10", "x := 10", "x = 10", "int x = 10"],
+        ans: 2
+      },
+      {
+        q: "What happens if you open a non-existent file in 'r' (read) mode?",
+        opts: ["Creates new file", "Returns empty string", "Raises FileNotFoundError", "Appends data"],
+        ans: 2
+      },
+      {
+        q: "Which function converts a numeric string '25' into an integer number?",
+        opts: ["str()", "int()", "float()", "num()"],
+        ans: 1
+      },
+      {
+        q: "What function outputs formatted text to the terminal screen?",
+        opts: ["console.log()", "print()", "write()", "echo()"],
+        ans: 1
+      }
+    ];
+
+    /* APP STATE CONTROLLER */
+    class Application {
+      constructor() {
+        this.student = { name: "", roll: "" };
+        this.timer = { seconds: 0, interval: null };
+        this.testState = {
+          currentPracIdx: 0,
+          pracScores: [0,0,0,0,0,0],
+          pracCode: ["","","","","",""],
+          currentVivaIdx: 0,
+          vivaScores: [],
+          currentMcqIdx: 0,
+          mcqScores: []
+        };
+        this.trainerState = {
+          vivaIdx: 0,
+          mcqIdx: 0,
+          mcqScore: 0
+        };
+
+        this.initEventListeners();
+      }
+
+      initEventListeners() {
+        const editor = document.getElementById("prac-code-editor");
+        if (editor) {
+          editor.addEventListener("input", () => this.updateLineNumbers("prac-lines", editor.value));
+        }
+        const tEditor = document.getElementById("trainer-code-editor");
+        if (tEditor) {
+          tEditor.addEventListener("input", () => {});
+        }
+      }
+
+      updateLineNumbers(linesId, val) {
+        const lineCnt = val.split("\n").length;
+        let lineStr = "";
+        for(let i=1; i<=Math.max(lineCnt, 10); i++) {
+          lineStr += i + "<br>";
+        }
+        document.getElementById(linesId).innerHTML = lineStr;
+      }
+
+      showView(viewId) {
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+        document.getElementById(viewId).classList.add("active");
+        
+        const header = document.getElementById("test-header");
+        if (["view-practical", "view-viva", "view-mcq"].includes(viewId)) {
+          header.classList.remove("hidden");
+        } else {
+          header.classList.add("hidden");
+        }
+        window.scrollTo(0,0);
+      }
+
+      /* TEST FLOW MANAGEMENT */
+      startTestFlow() {
+        this.showView("view-registration");
+      }
+
+      confirmRegistration(e) {
+        e.preventDefault();
+        const name = document.getElementById("reg-name").value.trim();
+        const roll = document.getElementById("reg-roll").value.trim();
+        
+        if (!name || !roll) return;
+
+        this.student.name = name;
+        this.student.roll = roll;
+
+        // Reset Test State
+        this.testState = {
+          currentPracIdx: 0,
+          pracScores: [0,0,0,0,0,0],
+          pracCode: ["","","","","",""],
+          currentVivaIdx: 0,
+          vivaScores: new Array(15).fill(0),
+          currentMcqIdx: 0,
+          mcqScores: new Array(15).fill(0)
+        };
+
+        // Header info
+        document.getElementById("bar-student-name").innerText = name;
+        document.getElementById("bar-student-roll").innerText = roll;
+        
+        this.startTimer();
+        this.loadPractical(0);
+        this.showView("view-practical");
+      }
+
+      startTimer() {
+        if(this.timer.interval) clearInterval(this.timer.interval);
+        this.timer.seconds = 0;
+        this.timer.interval = setInterval(() => {
+          this.timer.seconds++;
+          const m = Math.floor(this.timer.seconds / 60).toString().padStart(2, '0');
+          const s = (this.timer.seconds % 60).toString().padStart(2, '0');
+          document.getElementById("bar-timer").innerText = `${m}:${s}`;
+        }, 1000);
+      }
+
+      stopTimer() {
+        if(this.timer.interval) clearInterval(this.timer.interval);
+      }
+
+      updateProgress() {
+        // 6 practicals, 15 viva, 15 mcqs = total 36 steps
+        let step = 0;
+        const vId = document.querySelector(".view.active").id;
+        if(vId === "view-practical") step = this.testState.currentPracIdx;
+        else if(vId === "view-viva") step = 6 + this.testState.currentVivaIdx;
+        else if(vId === "view-mcq") step = 21 + this.testState.currentMcqIdx;
+        else if(vId === "view-result") step = 36;
+
+        const pct = Math.round((step / 36) * 100);
+        document.getElementById("bar-progress").innerText = `${pct}%`;
+        document.getElementById("progress-bar-fill").style.width = `${pct}%`;
+      }
+
+      /* PRACTICAL TEST SECTION */
+      loadPractical(idx) {
+        this.testState.currentPracIdx = idx;
+        const prac = PRACTICALS[idx];
+
+        document.getElementById("bar-section-name").innerText = `PRACTICAL (${idx+1}/6)`;
+        document.getElementById("prac-file-title").innerText = `practical_${idx+1}.py`;
+        document.getElementById("prac-number-badge").innerText = `PRACTICAL ${idx+1} OF 6`;
+        document.getElementById("prac-title").innerText = prac.title;
+        document.getElementById("prac-desc").innerText = prac.desc;
+
+        // Req list
+        const reqUl = document.getElementById("prac-req-list");
+        reqUl.innerHTML = prac.reqs.map(r => `<li>• ${r}</li>`).join("");
+
+        // Specific button label for Practical 4 requirement check
+        const subBtn = document.getElementById("prac-submit-btn");
+        if(idx === 3) {
+          subBtn.innerText = "SUBMIT PRACTICAL 4 →";
+        } else {
+          subBtn.innerText = "SUBMIT PRACTICAL →";
+        }
+
+        // Set Code Editor: ALWAYS start completely empty for the test
+        const editor = document.getElementById("prac-code-editor");
+        editor.value = this.testState.pracCode[idx] || "";
+        this.updateLineNumbers("prac-lines", editor.value);
+
+        // Hide results box
+        document.getElementById("prac-check-results").classList.add("hidden");
+        this.updateProgress();
+      }
+
+      checkPracticalCode() {
+        const idx = this.testState.currentPracIdx;
+        const prac = PRACTICALS[idx];
+        const code = document.getElementById("prac-code-editor").value;
+        this.testState.pracCode[idx] = code;
+
+        const checks = prac.checker(code);
+        let passCnt = 0;
+        let html = '<div style="font-weight:bold; margin-bottom:8px; color:var(--white);">AUTOMATED CODE ANALYZER RESULTS:</div>';
+
+        checks.forEach(c => {
+          if(c.pass) {
+            passCnt++;
+            html += `<div class="check-item pass">✓ ${c.label}</div>`;
+          } else {
+            html += `<div class="check-item fail">✗ ${c.label}</div>`;
+          }
+        });
+
+        const score = Math.round((passCnt / checks.length) * 10);
+        html += `<div style="margin-top:10px; font-weight:bold; color:var(--neon-green);">Practical Score: ${score} / 10</div>`;
+
+        const box = document.getElementById("prac-check-results");
+        box.innerHTML = html;
+        box.classList.remove("hidden");
+
+        return score;
+      }
+
+      resetPracticalCode() {
+        const editor = document.getElementById("prac-code-editor");
+        editor.value = "";
+        this.updateLineNumbers("prac-lines", "");
+        document.getElementById("prac-check-results").classList.add("hidden");
+      }
+
+      submitPractical() {
+        const score = this.checkPracticalCode();
+        const idx = this.testState.currentPracIdx;
+        this.testState.pracScores[idx] = score;
+
+        if (idx < 5) {
+          this.loadPractical(idx + 1);
+        } else {
+          // Move to Viva
+          this.initVivaSection();
+        }
+      }
+
+      /* VIVA TEST SECTION */
+      initVivaSection() {
+        this.testState.currentVivaIdx = 0;
+        document.getElementById("bar-section-name").innerText = "VIVA VOCE";
+        this.showView("view-viva");
+        this.loadVivaQuestion(0);
+      }
+
+      loadVivaQuestion(idx) {
+        this.testState.currentVivaIdx = idx;
+        const q = VIVA_QUESTIONS[idx];
+
+        document.getElementById("viva-counter-badge").innerText = `QUESTION ${idx+1} OF 15`;
+        document.getElementById("viva-question-text").innerText = q.q;
+        document.getElementById("viva-answer-input").value = "";
+        document.getElementById("viva-feedback").classList.add("hidden");
+
+        this.updateProgress();
+      }
+
+      submitVivaAnswer() {
+        const idx = this.testState.currentVivaIdx;
+        const q = VIVA_QUESTIONS[idx];
+        const ans = document.getElementById("viva-answer-input").value.toLowerCase().trim();
+
+        let matched = 0;
+        q.keywords.forEach(kw => {
+          if (ans.includes(kw)) matched++;
+        });
+
+        let score = 0;
+        if(matched >= 2 || (q.keywords.length <= 2 && matched >= 1)) score = 1;
+
+        this.testState.vivaScores[idx] = score;
+
+        const fb = document.getElementById("viva-feedback");
+        fb.innerHTML = score === 1 
+          ? '<div class="check-item pass">✓ Answer Accepted (Sufficient key concept coverage)</div>' 
+          : '<div class="check-item fail">✗ Needs improvement (Missing core concepts)</div>';
+        fb.classList.remove("hidden");
+      }
+
+      nextVivaQuestion() {
+        const idx = this.testState.currentVivaIdx;
+        if (idx < 14) {
+          this.loadVivaQuestion(idx + 1);
+        } else {
+          this.initMCQSection();
+        }
+      }
+
+      /* MCQ TEST SECTION */
+      initMCQSection() {
+        this.testState.currentMcqIdx = 0;
+        document.getElementById("bar-section-name").innerText = "MCQ TEST";
+        this.showView("view-mcq");
+        this.loadMCQQuestion(0);
+      }
+
+      loadMCQQuestion(idx) {
+        this.testState.currentMcqIdx = idx;
+        const q = MCQ_QUESTIONS[idx];
+
+        document.getElementById("mcq-counter-badge").innerText = `MCQ ${idx+1} OF 15`;
+        document.getElementById("mcq-question-text").innerText = q.q;
+
+        const container = document.getElementById("mcq-options-container");
+        container.innerHTML = "";
+
+        q.opts.forEach((opt, oIdx) => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.innerText = `${String.fromCharCode(65+oIdx)}) ${opt}`;
+          btn.onclick = () => this.selectMCQOption(oIdx);
+          container.appendChild(btn);
+        });
+
+        document.getElementById("mcq-feedback").classList.add("hidden");
+        document.getElementById("mcq-next-btn").classList.add("hidden");
+
+        this.updateProgress();
+      }
+
+      selectMCQOption(oIdx) {
+        const idx = this.testState.currentMcqIdx;
+        const q = MCQ_QUESTIONS[idx];
+        const btns = document.querySelectorAll("#mcq-options-container .option-btn");
+
+        // Disable all
+        btns.forEach(b => b.onclick = null);
+
+        const isCorrect = (oIdx === q.ans);
+        this.testState.mcqScores[idx] = isCorrect ? 1 : 0;
+
+        btns[oIdx].classList.add(isCorrect ? "correct" : "incorrect");
+        if(!isCorrect) {
+          btns[q.ans].classList.add("correct");
+        }
+
+        const fb = document.getElementById("mcq-feedback");
+        fb.innerHTML = isCorrect 
+          ? `<div class="check-item pass">✓ CORRECT ANSWER!</div>`
+          : `<div class="check-item fail">✗ WRONG ANSWER. Correct choice: ${q.opts[q.ans]}</div>`;
+        fb.classList.remove("hidden");
+
+        document.getElementById("mcq-next-btn").classList.remove("hidden");
+      }
+
+      nextMCQQuestion() {
+        const idx = this.testState.currentMcqIdx;
+        if(idx < 14) {
+          this.loadMCQQuestion(idx + 1);
+        } else {
+          this.renderFinalResults();
+        }
+      }
+
+      /* FINAL RESULT SCORECARD */
+      renderFinalResults() {
+        this.stopTimer();
+        this.showView("view-result");
+
+        const pracTotal = this.testState.pracScores.reduce((a,b)=>a+b, 0); // Max 60
+        const vivaTotal = this.testState.vivaScores.reduce((a,b)=>a+b, 0); // Max 15
+        const mcqTotal = this.testState.mcqScores.reduce((a,b)=>a+b, 0);   // Max 15
+        const overall = pracTotal + vivaTotal + mcqTotal; // Max 90
+        const overallPct = Math.round((overall / 90) * 100);
+
+        document.getElementById("res-student-name").innerText = this.student.name;
+        document.getElementById("res-student-roll").innerText = this.student.roll;
+
+        const m = Math.floor(this.timer.seconds / 60);
+        const s = this.timer.seconds % 60;
+        document.getElementById("res-time-taken").innerText = `${m}m ${s}s`;
+
+        document.getElementById("res-prac-score").innerText = `${pracTotal} / 60`;
+        document.getElementById("res-viva-score").innerText = `${vivaTotal} / 15`;
+        document.getElementById("res-mcq-score").innerText = `${mcqTotal} / 15`;
+        document.getElementById("res-overall-score").innerText = `${overall} / 90 (${overallPct}%)`;
+
+        // Generate Detailed Diagnostic Feedback
+        let mistakesHtml = "<ul style='margin-left:20px; color:var(--text-main); font-family:var(--font-mono); font-size:0.9rem; line-height:1.6;'>";
+        let missingTopics = [];
+
+        this.testState.pracScores.forEach((sc, i) => {
+          if(sc < 8) missingTopics.push(`Practical ${i+1}: ${PRACTICALS[i].title}`);
+        });
+
+        this.testState.vivaScores.forEach((sc, i) => {
+          if(sc === 0) missingTopics.push(`Viva Question ${i+1}: ${VIVA_QUESTIONS[i].q}`);
+        });
+
+        this.testState.mcqScores.forEach((sc, i) => {
+          if(sc === 0) missingTopics.push(`MCQ Topic: ${MCQ_QUESTIONS[i].q.substring(0, 40)}...`);
+        });
+
+        if(missingTopics.length === 0) {
+          mistakesHtml += `<li style="color:var(--neon-green);">✓ Outstanding execution! Perfect or near-perfect performance across all testing modules.</li>`;
+        } else {
+          missingTopics.slice(0, 8).forEach(top => {
+            mistakesHtml += `<li style="color:var(--accent-red);">✗ Review Needed: ${top}</li>`;
+          });
+          if(missingTopics.length > 8) {
+            mistakesHtml += `<li style="color:var(--accent-yellow);">... and ${missingTopics.length - 8} other concept areas.</li>`;
+          }
+        }
+        mistakesHtml += "</ul>";
+
+        document.getElementById("res-mistakes-container").innerHTML = mistakesHtml;
+      }
+
+      /* ================= TRAINER MODE ================= */
+      openTrainerMode() {
+        this.showView("view-trainer");
+        this.switchTrainerTab("guide");
+      }
+
+      switchTrainerTab(tab) {
+        document.querySelectorAll(".trainer-nav-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".trainer-tab-content").forEach(c => c.classList.add("hidden"));
+
+        document.getElementById(`tb-${tab}`).classList.add("active");
+        document.getElementById(`trainer-tab-${tab}`).classList.remove("hidden");
+
+        if(tab === "guide") this.renderTrainerGuide();
+        if(tab === "practice") this.initTrainerPractice();
+        if(tab === "viva") this.initTrainerViva();
+        if(tab === "mcq") this.initTrainerMCQ();
+      }
+
+      renderTrainerGuide() {
+        const container = document.getElementById("trainer-guide-list");
+        container.innerHTML = PRACTICALS.map(p => `
+          <div class="terminal-card">
+            <div class="terminal-header">
+              <div class="window-dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+              </div>
+              <div class="terminal-title">guide_practical_${p.id}.py</div>
+            </div>
+            <div class="terminal-body">
+              <h2 style="color:var(--white);">${p.title}</h2>
+              <div style="margin:10px 0; color:var(--text-main);"><strong>What is this practical?</strong> ${p.guide.what}</div>
+              <div style="margin:10px 0; color:var(--text-main);"><strong>What to do:</strong> ${p.guide.do}</div>
+              
+              <div class="req-box">
+                <div style="color:var(--neon-green); font-family:var(--font-mono); font-size:0.85rem;">STEP-BY-STEP EXPLANATION:</div>
+                <ul>${p.guide.steps.map(s => `<li>• ${s}</li>`).join("")}</ul>
+              </div>
+
+              <div style="margin-top:12px;">
+                <div style="color:var(--neon-green); font-family:var(--font-mono); font-size:0.85rem;">EXACT EXAMPLE PYTHON CODE:</div>
+                <div class="code-block">${p.guide.code}</div>
+              </div>
+
+              <div class="btn-group" style="margin-top:15px;">
+                <button type="button" class="btn btn-outline" onclick="app.jumpToTrainerPractice(${p.id})">PRACTICE THIS →</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      initTrainerPractice() {
+        const select = document.getElementById("trainer-prac-select");
+        select.innerHTML = PRACTICALS.map(p => `<option value="${p.id}">${p.title}</option>`).join("");
+        this.loadTrainerPracticeSelect();
+      }
+
+      jumpToTrainerPractice(id) {
+        this.switchTrainerTab("practice");
+        document.getElementById("trainer-prac-select").value = id;
+        this.loadTrainerPracticeSelect();
+      }
+
+      loadTrainerPracticeSelect() {
+        const id = parseInt(document.getElementById("trainer-prac-select").value);
+        const prac = PRACTICALS.find(p => p.id === id);
+
+        document.getElementById("trainer-prac-details").innerHTML = `
+          <div style="color:var(--white); font-weight:bold;">${prac.title}</div>
+          <div style="color:var(--text-main); font-size:0.9rem; margin-top:5px;">${prac.desc}</div>
+          <div style="color:var(--neon-green); font-family:var(--font-mono); font-size:0.8rem; margin-top:8px;">REQUIRED SYNTAX: ${prac.reqs.join(", ")}</div>
+        `;
+
+        document.getElementById("trainer-code-editor").value = "";
+        document.getElementById("trainer-check-results").classList.add("hidden");
+      }
+
+      checkTrainerPracticeCode() {
+        const id = parseInt(document.getElementById("trainer-prac-select").value);
+        const prac = PRACTICALS.find(p => p.id === id);
+        const code = document.getElementById("trainer-code-editor").value;
+
+        const checks = prac.checker(code);
+        let passCnt = 0;
+        let html = '<div style="font-weight:bold; margin-bottom:8px; color:var(--white);">PRACTICE CODE ANALYSIS:</div>';
+
+        checks.forEach(c => {
+          if(c.pass) {
+            passCnt++;
+            html += `<div class="check-item pass">✓ ${c.label}</div>`;
+          } else {
+            html += `<div class="check-item fail">✗ ${c.label}</div>`;
+          }
+        });
+
+        const pct = Math.round((passCnt / checks.length) * 100);
+        html += `<div style="margin-top:10px; font-weight:bold; color:var(--neon-green);">Concept Score: ${pct}%</div>`;
+        html += `<div style="font-size:0.85rem; color:#8b949e; margin-top:4px;">(Trainer Sandbox score does not affect real test results)</div>`;
+
+        const box = document.getElementById("trainer-check-results");
+        box.innerHTML = html;
+        box.classList.remove("hidden");
+      }
+
+      /* TRAINER VIVA FLASHCARDS */
+      initTrainerViva() {
+        this.trainerState.vivaIdx = 0;
+        this.loadTrainerVivaCard();
+      }
+
+      loadTrainerVivaCard() {
+        const idx = this.trainerState.vivaIdx;
+        const q = VIVA_QUESTIONS[idx];
+
+        document.getElementById("trainer-viva-badge").innerText = `CARD ${idx+1} OF 15`;
+        document.getElementById("trainer-viva-q").innerText = q.q;
+
+        const aBox = document.getElementById("trainer-viva-a");
+        aBox.innerHTML = `<strong>Key Concepts:</strong> ${q.keywords.join(", ")}<br><br><em>Sample Explanation:</em> ${q.q} involves understanding how Python processes core parameters like ${q.keywords[0]} and ${q.keywords[1] || 'execution'}.`;
+        aBox.classList.add("hidden");
+      }
+
+      toggleTrainerVivaAnswer() {
+        document.getElementById("trainer-viva-a").classList.toggle("hidden");
+      }
+
+      nextTrainerViva() {
+        if(this.trainerState.vivaIdx < 14) {
+          this.trainerState.vivaIdx++;
+          this.loadTrainerVivaCard();
+        }
+      }
+
+      prevTrainerViva() {
+        if(this.trainerState.vivaIdx > 0) {
+          this.trainerState.vivaIdx--;
+          this.loadTrainerVivaCard();
+        }
+      }
+
+      /* TRAINER MCQ PRACTICE */
+      initTrainerMCQ() {
+        this.trainerState.mcqIdx = 0;
+        this.trainerState.mcqScore = 0;
+        this.loadTrainerMCQCard();
+      }
+
+      loadTrainerMCQCard() {
+        const idx = this.trainerState.mcqIdx;
+        const q = MCQ_QUESTIONS[idx];
+
+        document.getElementById("trainer-mcq-badge").innerText = `PRACTICE MCQ ${idx+1} OF 15`;
+        document.getElementById("trainer-mcq-q").innerText = q.q;
+
+        const container = document.getElementById("trainer-mcq-opts");
+        container.innerHTML = "";
+
+        q.opts.forEach((opt, oIdx) => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.innerText = `${String.fromCharCode(65+oIdx)}) ${opt}`;
+          btn.onclick = () => this.selectTrainerMCQOption(oIdx);
+          container.appendChild(btn);
+        });
+
+        document.getElementById("trainer-mcq-feedback").classList.add("hidden");
+        document.getElementById("trainer-mcq-next-btn").classList.add("hidden");
+      }
+
+      selectTrainerMCQOption(oIdx) {
+        const idx = this.trainerState.mcqIdx;
+        const q = MCQ_QUESTIONS[idx];
+        const btns = document.querySelectorAll("#trainer-mcq-opts .option-btn");
+
+        btns.forEach(b => b.onclick = null);
+
+        const isCorrect = (oIdx === q.ans);
+        if(isCorrect) this.trainerState.mcqScore++;
+
+        btns[oIdx].classList.add(isCorrect ? "correct" : "incorrect");
+        if(!isCorrect) btns[q.ans].classList.add("correct");
+
+        const fb = document.getElementById("trainer-mcq-feedback");
+        fb.innerHTML = isCorrect 
+          ? `<div class="check-item pass">✓ CORRECT! Excellent practice.</div>`
+          : `<div class="check-item fail">✗ INCORRECT. Correct choice is: ${q.opts[q.ans]}</div>`;
+        fb.classList.remove("hidden");
+
+        document.getElementById("trainer-mcq-next-btn").classList.remove("hidden");
+      }
+
+      nextTrainerMCQ() {
+        if(this.trainerState.mcqIdx < 14) {
+          this.trainerState.mcqIdx++;
+          this.loadTrainerMCQCard();
+        } else {
+          alert(`Practice Session Complete! You answered ${this.trainerState.mcqScore} / 15 practice questions correctly.`);
+          this.initTrainerMCQ();
+        }
+      }
+    }
+
+    // Initialize App
+    const app = new Application();
+  </script>
+</body>
+</html>
